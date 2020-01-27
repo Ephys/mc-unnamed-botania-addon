@@ -1,8 +1,9 @@
 package com.example.examplemod.interceptor;
 
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.renderer.block.model.ModelResourceLocation;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.entity.monster.EntityEnderman;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -11,6 +12,8 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldServer;
+import net.minecraft.world.biome.Biome;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import vazkii.botania.api.lexicon.LexiconEntry;
@@ -48,6 +51,10 @@ public class SubTileInterceptor extends SubTileFunctional {
       return;
     }
 
+    if (this.redstoneSignal > 0) {
+      return;
+    }
+
     if (!interceptors.containsKey(this)) {
       interceptors.put(this, null);
     }
@@ -57,8 +64,40 @@ public class SubTileInterceptor extends SubTileFunctional {
       this.cooldown--;
     }
 
-    if (ticksExisted % 50 == 0) {
-      sync();
+    if (this.cooldown <= -128) {
+      if (this.isUpgraded && this.mana > MANA_PER_OP) {
+        this.cooldown = 40;
+        this.mana -= MANA_PER_OP;
+        this.doSpecialSpawn();
+      } else {
+        this.cooldown = 0;
+      }
+    }
+  }
+
+  private void doSpecialSpawn() {
+    World world = getWorld();
+    if (!(world instanceof WorldServer)) {
+      return;
+    }
+
+    Biome.SpawnListEntry spawnList = ((WorldServer) world).getSpawnListEntryForTypeAt(EnumCreatureType.MONSTER, getPos().up());
+    if (spawnList == null) {
+      return;
+    }
+
+    try {
+      Entity entity = spawnList.newInstance(world);
+      BlockPos pos = getPos();
+      entity.setPosition(
+        pos.getX() + rand.nextInt(8) - 4,
+        pos.getY() + 1,
+        pos.getZ() + rand.nextInt(8) - 4
+      );
+
+      world.spawnEntity(entity);
+    } catch (Exception e) {
+      e.printStackTrace();
     }
   }
 
@@ -93,6 +132,12 @@ public class SubTileInterceptor extends SubTileFunctional {
   public boolean interceptSpawn(EntityLivingBase entity) {
 
     if (this.cooldown > 0) {
+      return false;
+    }
+
+    // somewhat undecided on whether redstone signal should
+    // disable spawn or disable spawn + spawn prevention
+    if (this.redstoneSignal > 0) {
       return false;
     }
 

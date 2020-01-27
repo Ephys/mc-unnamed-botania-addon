@@ -13,7 +13,6 @@ import net.minecraftforge.fml.common.eventhandler.Event;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import vazkii.botania.api.BotaniaAPI;
-import vazkii.botania.api.lexicon.KnowledgeType;
 import vazkii.botania.api.recipe.RecipePetals;
 import vazkii.botania.common.item.block.ItemBlockSpecialFlower;
 import vazkii.botania.common.lexicon.BasicLexiconEntry;
