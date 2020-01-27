@@ -14,10 +14,14 @@ import vazkii.botania.api.BotaniaAPIClient;
 @Mod.EventBusSubscriber(modid = ExampleMod.MODID, value = Side.CLIENT)
 public class FeatureInterceptorClient {
 
+  public static final ModelResourceLocation interceptorDefaultNormal = new ModelResourceLocation(new ResourceLocation(ExampleMod.MODID, SubTileInterceptor.NAME), "normal");
+  public static final ModelResourceLocation interceptorDefaultInventory = new ModelResourceLocation(new ResourceLocation(ExampleMod.MODID, SubTileInterceptor.NAME), "inventory");
+
+//  public static final ModelResourceLocation interceptorUpgradeNormal = new ModelResourceLocation(new ResourceLocation(ExampleMod.MODID, SubTileInterceptor.NAME + "_upgrade"), "normal");
+//  public static final ModelResourceLocation interceptorUpgradeInventory = new ModelResourceLocation(new ResourceLocation(ExampleMod.MODID, SubTileInterceptor.NAME+ "_upgrade"), "inventory");
+
   @SubscribeEvent
   public static void preInit(ModelRegistryEvent event) {
-    BotaniaAPIClient.registerSubtileModel(SubTileInterceptor.NAME,
-      new ModelResourceLocation(new ResourceLocation(ExampleMod.MODID, SubTileInterceptor.NAME), "normal"),
-      new ModelResourceLocation(new ResourceLocation(ExampleMod.MODID, SubTileInterceptor.NAME), "inventory"));
+    BotaniaAPIClient.registerSubtileModel(SubTileInterceptor.NAME, interceptorDefaultNormal, interceptorDefaultInventory);
   }
 }

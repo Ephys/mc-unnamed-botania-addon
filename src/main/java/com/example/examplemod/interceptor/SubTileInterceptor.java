@@ -1,15 +1,23 @@
 package com.example.examplemod.interceptor;
 
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.monster.EntityEnderman;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import vazkii.botania.api.lexicon.LexiconEntry;
 import vazkii.botania.api.subtile.RadiusDescriptor;
 import vazkii.botania.api.subtile.SubTileFunctional;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.WeakHashMap;
@@ -27,8 +35,10 @@ public class SubTileInterceptor extends SubTileFunctional {
   private static final int COOLDOWN = 5; // 1 mob per .5 second max
 
   private static final String TAG_COOLDOWN = "cooldown";
+  private static final String TAG_UPGRADED = "upg";
 
   private byte cooldown = 0;
+  private boolean isUpgraded = false;
 
   @Override
   public void onUpdate() {
@@ -57,6 +67,7 @@ public class SubTileInterceptor extends SubTileFunctional {
     super.writeToPacketNBT(cmp);
 
     cmp.setByte(TAG_COOLDOWN, cooldown);
+    cmp.setBoolean(TAG_UPGRADED, isUpgraded);
   }
 
   @Override
@@ -64,12 +75,24 @@ public class SubTileInterceptor extends SubTileFunctional {
     super.readFromPacketNBT(cmp);
 
     cooldown = cmp.getByte(TAG_COOLDOWN);
+    isUpgraded = cmp.getBoolean(TAG_UPGRADED);
+  }
+
+  @Override
+  public List<ItemStack> getDrops(List<ItemStack> list) {
+
+    if (isUpgraded) {
+      ItemStack newItem = FeatureInterceptor.botaniaItemGaiaSpirit.copy();
+      newItem.setCount(1);
+      list.add(newItem);
+    }
+
+    return super.getDrops(list);
   }
 
   public boolean interceptSpawn(EntityLivingBase entity) {
 
     if (this.cooldown > 0) {
-      System.out.println("cooldown too high");
       return false;
     }
 
@@ -88,23 +111,19 @@ public class SubTileInterceptor extends SubTileFunctional {
 
   public boolean canIntercept(EntityLivingBase entity) {
     if (!isAlive()) {
-      System.out.println("flower is dead");
       return false;
     }
 
     if (entity.getEntityWorld() != getWorld()) {
-      System.out.println("flower in another world");
       return false;
     }
 
     // use vinculotus
     if (entity instanceof EntityEnderman) {
-      System.out.println("is enderman");
       return false;
     }
 
     if (this.mana < (MANA_PER_TICK + MANA_PER_OP)) {
-      System.out.println("no mana");
       return false;
     }
 
@@ -113,7 +132,6 @@ public class SubTileInterceptor extends SubTileFunctional {
       distance(entity.posX, tePos.getX()) > getInterceptionRadius()
         || distance(entity.posZ, tePos.getZ()) > getInterceptionRadius()
     ) {
-      System.out.println("too far:  R=" +  getInterceptionRadius() + ", x:{"+entity.posX+", "+tePos.getX()+"}="+distance(entity.posX, tePos.getX())+", z:{"+entity.posZ+", "+tePos.getZ()+"}="+distance(entity.posZ, tePos.getZ()));
       return false;
     }
 
@@ -144,11 +162,10 @@ public class SubTileInterceptor extends SubTileFunctional {
     return Math.abs(x1 - x2);
   }
 
-  // TODO
   @Override
   public LexiconEntry getEntry() {
     // TODO
-    return super.getEntry();
+    return FeatureInterceptor.interceptorLexiconEntry;
   }
 
   @SideOnly(Side.CLIENT)
@@ -160,5 +177,31 @@ public class SubTileInterceptor extends SubTileFunctional {
   @Override
   public int getColor() {
     return 0x0A6051;
+  }
+
+  @Override
+  public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
+    ItemStack heldItem = player.getHeldItem(hand);
+
+    if (this.isUpgraded) {
+      return false;
+    }
+
+    if (!heldItem.isItemEqual(FeatureInterceptor.botaniaItemGaiaSpirit)) {
+      return false;
+    }
+
+    if (world.isRemote) {
+      return true;
+    }
+
+    if (!player.isCreative()) {
+      heldItem.shrink(1);
+    }
+
+    this.isUpgraded = true;
+    this.sync();
+
+    return true;
   }
 }

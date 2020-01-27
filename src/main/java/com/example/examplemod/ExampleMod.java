@@ -7,7 +7,12 @@ import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import org.apache.logging.log4j.Logger;
 
-@Mod(modid = ExampleMod.MODID, name = ExampleMod.NAME, version = ExampleMod.VERSION)
+@Mod(
+  modid = ExampleMod.MODID,
+  name = ExampleMod.NAME,
+  version = ExampleMod.VERSION,
+  dependencies = "required-after:botania"
+)
 public class ExampleMod {
   public static final String MODID = "examplemod";
   public static final String NAME = "Example Mod";
@@ -32,11 +37,5 @@ public class ExampleMod {
 }
 
 // TODO:
-//  - flower subtitle
-//  - lexicon page
-//  - upgrade gaia spirit
-
-// TODO:
 //  - fishing pole
 //  - end ore gen
-//  - bonemeal grass

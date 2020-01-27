@@ -1,2 +1,8 @@
 tile.botania:flower.interceptor.name=Magnépenthès
 tile.botania:flower.interceptor.reference=
+
+#book
+botania.entry.interceptor=Magnépenthès
+botania.page.interceptor0=
+botania.page.interceptor1=
+botania.page.interceptor2=

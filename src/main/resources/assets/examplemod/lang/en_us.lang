@@ -1,2 +1,9 @@
 tile.botania:flower.interceptor.name=Magnepenthes
-tile.botania:flower.interceptor.reference=
+tile.botania:flower.interceptor.reference=Copying other mods for a living
+
+#book
+botania.entry.interceptor=Magnepenthes
+botania.tagline.interceptor=Prevents hostiles from spawning
+botania.page.interceptor0=The &1Magnepenthes&0 is able to reach into the source of malevolence of the world. For a decent amount of &4Mana&0, it prevent &4hostiles&0 from crawling the region, forcing them to appear close to the flower instead.
+botania.page.interceptor1=Placing the flower on top of &4Enchanted soil&0 will help it reach further, incresing its area of effect.<br>Using &4Gaia spirit&0 on it will help it find creatures even if no player is around.
+botania.page.interceptor2=It doesn't even give off any light

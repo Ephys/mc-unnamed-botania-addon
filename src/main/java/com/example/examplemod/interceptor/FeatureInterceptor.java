@@ -4,19 +4,32 @@ import com.example.examplemod.ExampleMod;
 import net.minecraft.block.Block;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.EnumCreatureType;
+import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.event.entity.living.LivingSpawnEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.Event;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 import vazkii.botania.api.BotaniaAPI;
+import vazkii.botania.api.lexicon.KnowledgeType;
+import vazkii.botania.api.recipe.RecipePetals;
+import vazkii.botania.common.item.block.ItemBlockSpecialFlower;
+import vazkii.botania.common.lexicon.BasicLexiconEntry;
+import vazkii.botania.common.lexicon.page.PagePetalRecipe;
+import vazkii.botania.common.lexicon.page.PageText;
 
 @Mod.EventBusSubscriber(modid = ExampleMod.MODID)
 public class FeatureInterceptor {
 
   public static boolean enabled = true;
   public static int spawnerRadius = 64;
+
+  @GameRegistry.ItemStackHolder(value = "botania:manaResource", meta = 5)
+  public static ItemStack botaniaItemGaiaSpirit;
+
+  public static BasicLexiconEntry interceptorLexiconEntry;
 
   @SubscribeEvent
   public static void registerBlocks(RegistryEvent.Register<Block> event) {
@@ -35,19 +48,26 @@ public class FeatureInterceptor {
       return;
     }
 
-    /*
- recipePetroPetunia = BotaniaAPI.registerPetalRecipe(ItemBlockSpecialFlower.ofType(SubTilePetroPetunia.NAME),
-                "redstoneRoot", "runeWaterB", "runeFireB", "petalOrange", "petalBlack", "petalBrown",
-                "elvenDragonstone");
- */
+    RecipePetals interceptorRecipe = BotaniaAPI.registerPetalRecipe(
+      ItemBlockSpecialFlower.ofType(SubTileInterceptor.NAME),
+      "petalPurple",
+      "petalPurple",
+      "petalBlue",
+      "elvenDragonstone",
+      "bEnderAirBottle",
+      "runeSlothB",
+      "runeWrathB",
+      "runeEnvyB"
+    );
 
-/*
-        petroPetunia = new BasicLexiconEntry(SubTilePetroPetunia.NAME, BotaniaAPI.categoryGenerationFlowers);
-        petroPetunia.setLexiconPages(new PageText("0"), new PagePetalRecipe<>("1", BotaniaRecipes.recipePetroPetunia));
-        petroPetunia.setKnowledgeType(BotaniaAPI.elvenKnowledge);
- */
+    interceptorLexiconEntry = new BasicLexiconEntry(SubTileInterceptor.NAME, BotaniaAPI.categoryFunctionalFlowers);
+    interceptorLexiconEntry.setLexiconPages(
+      new PageText("0"),
+      new PageText("1"),
+      new PagePetalRecipe<>("2", interceptorRecipe)
+    );
+    interceptorLexiconEntry.setKnowledgeType(BotaniaAPI.elvenKnowledge);
   }
-
 
   @SubscribeEvent
   public void onMobSpawn(LivingSpawnEvent.SpecialSpawn spawnEvent) {
@@ -85,8 +105,6 @@ public class FeatureInterceptor {
     // interception failed due to cooldown, cancel spawn
     if (hasInterceptorInRange) {
       spawnEvent.setCanceled(true);
-    } else {
-      System.out.println("no interceptor to prevent spawn");
     }
   }
 }
