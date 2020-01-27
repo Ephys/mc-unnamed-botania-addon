@@ -199,6 +199,11 @@ public class SubTileInterceptor extends SubTileFunctional {
     return MAX_MANA;
   }
 
+  @Override
+  public boolean acceptsRedstone() {
+    return true;
+  }
+
   protected boolean isAlive() {
     return !supertile.isInvalid();
   }
